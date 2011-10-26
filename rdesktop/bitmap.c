@@ -66,6 +66,7 @@
 static RD_BOOL
 bitmap_decompress1(uint8 * output, int width, int height, uint8 * input, int size)
 {
+    __android_log_print(ANDROID_LOG_INFO, "JNIMsg", "bitmap_decompress1");
 	uint8 *end = input + size;
 	uint8 *prevline = NULL, *line = NULL;
 	int opcode, count, offset, isfillormix, x = width;
@@ -264,6 +265,7 @@ bitmap_decompress1(uint8 * output, int width, int height, uint8 * input, int siz
 static RD_BOOL
 bitmap_decompress2(uint8 * output, int width, int height, uint8 * input, int size)
 {
+    __android_log_print(ANDROID_LOG_INFO, "JNIMsg", "bitmap_decompress2");
 	uint8 *end = input + size;
 	uint16 *prevline = NULL, *line = NULL;
 	int opcode, count, offset, isfillormix, x = width;
@@ -463,6 +465,7 @@ bitmap_decompress2(uint8 * output, int width, int height, uint8 * input, int siz
 static RD_BOOL
 bitmap_decompress3(uint8 * output, int width, int height, uint8 * input, int size)
 {
+    __android_log_print(ANDROID_LOG_INFO, "JNIMsg", "bitmap_decompress3");
 	uint8 *end = input + size;
 	uint8 *prevline = NULL, *line = NULL;
 	int opcode, count, offset, isfillormix, x = width;
@@ -749,6 +752,7 @@ bitmap_decompress3(uint8 * output, int width, int height, uint8 * input, int siz
 static int
 process_plane(uint8 * in, int width, int height, uint8 * out, int size)
 {
+    __android_log_print(ANDROID_LOG_INFO, "JNIMsg", "process_plane");
 	int indexw;
 	int indexh;
 	int code;
@@ -855,6 +859,7 @@ process_plane(uint8 * in, int width, int height, uint8 * out, int size)
 static RD_BOOL
 bitmap_decompress4(uint8 * output, int width, int height, uint8 * input, int size)
 {
+    __android_log_print(ANDROID_LOG_INFO, "JNIMsg", "bitmap_decompress4");
 	int code;
 	int bytes_pro;
 	int total_pro;
@@ -883,6 +888,7 @@ bitmap_decompress4(uint8 * output, int width, int height, uint8 * input, int siz
 RD_BOOL
 bitmap_decompress(uint8 * output, int width, int height, uint8 * input, int size, int Bpp)
 {
+    __android_log_print(ANDROID_LOG_INFO, "JNIMsg", "bitmap_decompress");
 	RD_BOOL rv = False;
 
 	switch (Bpp)

@@ -24,7 +24,7 @@ LOCAL_SRC_FILES := rdesktop.c \
                    printer.c \
                    disk.c \
                    serial.c \
-                  
+                   xwin.c \
                    
                    
                    

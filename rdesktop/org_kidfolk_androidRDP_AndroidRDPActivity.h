@@ -13,7 +13,7 @@ extern "C" {
  * Signature: ()Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_getenv
-  (JNIEnv *, jclass);
+  (JNIEnv *, jobject);
 
 /*
  * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
@@ -21,7 +21,7 @@ JNIEXPORT jstring JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_getenv
  * Signature: (Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setUsername
-  (JNIEnv *, jclass, jstring);
+  (JNIEnv *, jobject, jstring);
 
 /*
  * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
@@ -29,7 +29,7 @@ JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setUsernam
  * Signature: (Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setPassword
-  (JNIEnv *, jclass, jstring);
+  (JNIEnv *, jobject, jstring);
 
 /*
  * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
@@ -37,7 +37,15 @@ JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setPasswor
  * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)I
  */
 JNIEXPORT jint JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1connect
-  (JNIEnv *, jclass, jstring, jint, jstring, jstring, jstring, jstring, jboolean);
+  (JNIEnv *, jobject, jstring, jint, jstring, jstring, jstring, jstring, jboolean);
+
+/*
+ * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
+ * Method:    rdpdr_init
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdpdr_1init
+  (JNIEnv *, jobject);
 
 /*
  * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
@@ -45,15 +53,39 @@ JNIEXPORT jint JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1conne
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1main_1loop
-  (JNIEnv *, jclass);
+  (JNIEnv *, jobject);
 
 /*
  * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
- * Method:    getBitmapBytesFormNative
- * Signature: (IIII[Ljava/lang/Byte;)[Ljava/lang/Byte;
+ * Method:    rdp_disconnect
+ * Signature: ()V
  */
-JNIEXPORT jobjectArray JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_getBitmapBytesFormNative
-  (JNIEnv *, jclass, jint, jint, jint, jint, jobjectArray);
+JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1disconnect
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
+ * Method:    rdp_reset_state
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1reset_1state
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
+ * Method:    cache_save_state
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_cache_1save_1state
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
+ * Method:    renderBitmap
+ * Signature: (Landroid/graphics/Bitmap;)V
+ */
+JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_renderBitmap
+  (JNIEnv *, jobject, jobject);
 
 #ifdef __cplusplus
 }

@@ -61,7 +61,10 @@ RD_BOOL g_console_session = False;
 RD_BOOL deactivated;
 uint32 ext_disc_reason = 0;
 
-JNIEXPORT jstring JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_getenv(JNIEnv *env, jclass thiz)
+JNIEnv *genv;
+jobject *gobj;
+
+JNIEXPORT jstring JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_getenv(JNIEnv *env, jobject obj)
 {
     __android_log_print(ANDROID_LOG_INFO, "JNIMsg", "getenv");
     return (*env)->NewStringUTF(env, getenv("EXTERNAL_STORAGE"));
@@ -72,7 +75,7 @@ JNIEXPORT jstring JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_getenv(
  * Method:    setUsername
  * Signature: (Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setUsername(JNIEnv *env, jclass thiz, jstring username)
+JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setUsername(JNIEnv *env, jobject obj, jstring username)
 {
 //    g_username = (char *) xmalloc(strlen(username) + 1);
 //    STRNCPY(g_username, username, sizeof(g_username));
@@ -87,7 +90,7 @@ JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setUsernam
  * Method:    setPassword
  * Signature: (Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setPassword(JNIEnv *env, jclass thiz, jstring jpassword)
+JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setPassword(JNIEnv *env, jobject obj, jstring jpassword)
 {
     const char *str = (*env)->GetStringUTFChars(env,jpassword,NULL);
     password = (char *) xmalloc(strlen(str) + 1);
@@ -95,8 +98,10 @@ JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setPasswor
     //__android_log_print(ANDROID_LOG_INFO, "JNIMsg", "setPassword:%s",str);
 }
 
-JNIEXPORT jint JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1connect(JNIEnv *env, jclass thiz, jstring jserver, jint flags, jstring domain, jstring jpassword, jstring shell, jstring directory, jboolean g_redirect)
+JNIEXPORT jint JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1connect(JNIEnv *env, jobject obj, jstring jserver, jint flags, jstring domain, jstring jpassword, jstring shell, jstring directory, jboolean g_redirect)
 {
+    genv = env;
+    gobj = obj;
     __android_log_print(ANDROID_LOG_INFO,"JNIMsg","rdp_1connect");
     int result = 1;
     const char *nativeServer = (*env)->GetStringUTFChars(env,jserver,NULL);
@@ -111,13 +116,76 @@ JNIEXPORT jint JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1conne
 }
 
 /*
+ * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
+ * Method:    rdpdr_init
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdpdr_1init(JNIEnv *env, jobject obj)
+{
+    __android_log_print(ANDROID_LOG_INFO,"JNIMsg","rdpdr_1init");
+    rdpdr_init();
+
+}
+
+/*
  * Class:     org_kidfolk_androidRDP_RdesktopNative
  * Method:    rdp_main_loop
  * Signature: (II)V
  */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1main_1loop(JNIEnv *env, jclass thiz)
+JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1main_1loop(JNIEnv *env, jobject obj)
 {
     rdp_main_loop(&deactivated, &ext_disc_reason);
+}
+
+/*
+ * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
+ * Method:    rdp_disconnect
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1disconnect(JNIEnv *env, jobject obj)
+{
+
+    rdp_disconnect();
+}
+
+/*
+ * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
+ * Method:    rdp_reset_state
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1reset_1state
+(JNIEnv * env, jobject obj)
+{
+    rdp_reset_state();
+}
+
+/*
+ * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
+ * Method:    cache_save_state
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_cache_1save_1state
+(JNIEnv * env, jobject obj)
+{
+    cache_save_state();
+
+}
+
+void android_bitmap_creater(int x,int y,int cx,int cy,int width,int height,uint8 *data)
+{
+    jclass cls = (*genv)->GetObjectClass(genv, gobj);
+    jmethodID mid = (*genv)->GetMethodID(genv,cls,"getBitmapBytesFormNative","(IIII[B)V");
+    if (mid == NULL) {
+        return; /* method not found */
+    }
+    jint size = strlen(data);
+    jbyteArray bArray = (*genv)->NewByteArray(genv,size);
+    memcpy(bArray,data,size);
+    //jstring s = (*genv)->NewString(genv,data, size);
+    __android_log_print(ANDROID_LOG_INFO,"JNIMsg","android_bitmap_creater(x=%d,y=%d,cx=%d,cy=%d,width=%d,height=%d,data=%d)",x, y, cx, cy, width, height,strlen(data));
+    (*genv)->CallVoidMethod(genv, gobj, mid,x,y,width,height,bArray);
+    __android_log_print(ANDROID_LOG_INFO,"JNIMsg","android_bitmap_creater(x=%d,y=%d,cx=%d,cy=%d,width=%d,height=%d,data=%p)",x, y, cx, cy, width, height,data);
+
 }
 
 /* report an unimplemented protocol feature */

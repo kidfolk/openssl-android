@@ -1192,7 +1192,8 @@ void process_bitmap_updates(STREAM s) {
 				in_uint8a(s, &bmpdata[(height - y - 1) * (width * Bpp)],
 						width * Bpp);
 			}
-			// TODO ui_paint_bitmap(left, top, cx, cy, width, height, bmpdata);
+            __android_log_print(ANDROID_LOG_INFO,"JNIMsg","in if do ui_paint_bitmap");
+			ui_paint_bitmap(left, top, cx, cy, width, height, bmpdata);
 			xfree(bmpdata);
 			continue;
 		}
@@ -1208,7 +1209,7 @@ void process_bitmap_updates(STREAM s) {
 		}in_uint8p(s, data, size);
 		bmpdata = (uint8 *) xmalloc(width * height * Bpp);
 		if (bitmap_decompress(bmpdata, width, height, data, size, Bpp)) {
-			// TODO ui_paint_bitmap(left, top, cx, cy, width, height, bmpdata);
+			ui_paint_bitmap(left, top, cx, cy, width, height, bmpdata);
 		} else {
 			DEBUG_RDP5(("Failed to decompress data\n"));
 		}
@@ -1374,18 +1375,22 @@ static RD_BOOL process_data_pdu(STREAM s, uint32 * ext_disc_reason) {
 
 	switch (data_pdu_type) {
 	case RDP_DATA_PDU_UPDATE:
+            __android_log_print(ANDROID_LOG_INFO,"JNIMsg","process_data_pdu : RDP_DATA_PDU_UPDATE");
 		process_update_pdu(s);
 		break;
 
 	case RDP_DATA_PDU_CONTROL:
-		DEBUG(("Received Control PDU\n"));
+             __android_log_print(ANDROID_LOG_INFO,"JNIMsg","process_data_pdu : Received Control PDU");
+		//DEBUG(("Received Control PDU\n"));
 		break;
 
 	case RDP_DATA_PDU_SYNCHRONISE:
-		DEBUG(("Received Sync PDU\n"));
+            __android_log_print(ANDROID_LOG_INFO,"JNIMsg","process_data_pdu : Received Sync PDU");
+		//DEBUG(("Received Sync PDU\n"));
 		break;
 
 	case RDP_DATA_PDU_POINTER:
+            __android_log_print(ANDROID_LOG_INFO,"JNIMsg","process_data_pdu : RDP_DATA_PDU_POINTER");
 		process_pointer_pdu(s);
 		break;
 
@@ -1394,13 +1399,14 @@ static RD_BOOL process_data_pdu(STREAM s, uint32 * ext_disc_reason) {
 		break;
 
 	case RDP_DATA_PDU_LOGON:
-            __android_log_print(ANDROID_LOG_INFO,"JNIMsg","Received Logon PDU")
-		DEBUG(("Received Logon PDU\n"));
+            __android_log_print(ANDROID_LOG_INFO,"JNIMsg","Received Logon PDU");
+		//DEBUG(("Received Logon PDU\n"));
 		/* User logged on */
 		process_pdu_logon(s);
 		break;
 
 	case RDP_DATA_PDU_DISCONNECT:
+            __android_log_print(ANDROID_LOG_INFO,"JNIMsg","process_data_pdu : PDU RDP_DATA_PDU_DISCONNECT");
 		process_disconnect_pdu(s, ext_disc_reason);
 
 		/* We used to return true and disconnect immediately here, but
