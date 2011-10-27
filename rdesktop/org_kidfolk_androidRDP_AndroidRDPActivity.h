@@ -81,6 +81,22 @@ JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_cache_1sav
 
 /*
  * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
+ * Method:    rdp_send_client_window_status
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1send_1client_1window_1status
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
+ * Method:    rdp_send_input
+ * Signature: (ISSSS)V
+ */
+JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1send_1input
+  (JNIEnv *, jobject, jint, jshort, jshort, jshort, jshort);
+
+/*
+ * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
  * Method:    renderBitmap
  * Signature: (Landroid/graphics/Bitmap;)V
  */

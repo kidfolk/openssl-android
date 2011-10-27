@@ -171,6 +171,29 @@ JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_cache_1sav
 
 }
 
+/*
+ * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
+ * Method:    rdp_send_client_window_status
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1send_1client_1window_1status
+(JNIEnv *env, jobject obj, jint status)
+{
+    __android_log_print(ANDROID_LOG_INFO,"JNIMsg","Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1send_1client_1window_1status");
+    rdp_send_client_window_status(status);
+}
+
+/*
+ * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
+ * Method:    rdp_send_input
+ * Signature: (ISSSS)V
+ */
+JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1send_1input
+(JNIEnv *env, jobject obj, jint time, jshort message_type, jshort device_flags, jshort param1, jshort param2)
+{
+    rdp_send_input(time,message_type,device_flags,param1,param2);
+}
+
 void android_bitmap_creater(int x,int y,int cx,int cy,int width,int height,uint8 *data)
 {
     jclass cls = (*genv)->GetObjectClass(genv, gobj);

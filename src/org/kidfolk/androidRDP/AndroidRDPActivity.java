@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,30 +15,33 @@ public class AndroidRDPActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		TextView text = (TextView) findViewById(R.id.text);
-		setUsername("kidfolk");
-		setPassword("xwjshow");
-		rdpdr_init();
-		Thread rdesktopMainThread = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				while (true) {
-					rdp_reset_state();
-					int result = rdp_connect("192.168.3.115", 51, "", "", "",
-							"", false);
-					if (result == 0) {
-						return;
-					}
-					rdp_main_loop();
-					
-					rdp_disconnect();
-				}
-
-			}
-
-		});
-		rdesktopMainThread.start();
-		cache_save_state();
+		ImageView imageView = (ImageView) findViewById(R.id.image);
+		imageView.setImageResource(R.drawable.test);
+//		RemoteView remoteView = (RemoteView) findViewById(R.id.image);
+//		setUsername("kidfolk");
+//		setPassword("xwjshow");
+//		rdpdr_init();
+//		Thread rdesktopMainThread = new Thread(new Runnable() {
+//
+//			@Override
+//			public void run() {
+//				while (true) {
+//					rdp_reset_state();
+//					int result = rdp_connect("192.168.3.115", 51, "", "", "",
+//							"", false);
+//					if (result == 0) {
+//						return;
+//					}
+//					rdp_main_loop();
+//					
+//					rdp_disconnect();
+//				}
+//
+//			}
+//
+//		});
+//		rdesktopMainThread.start();
+//		cache_save_state();
 		// String str = RdesktopNative.getenv();
 		//text.setText(result + "");
 	}
@@ -64,6 +66,11 @@ public class AndroidRDPActivity extends Activity {
 
 	private native void cache_save_state();
 	
+	private native void rdp_send_client_window_status(int status);
+	
+	private native void rdp_send_input(int time, short message_type, short device_flags,
+			short param1, short param2);
+	
 	private native void renderBitmap(Bitmap  bitmap);
 
 	private void getBitmapBytesFormNative(int x, int y,
@@ -74,19 +81,20 @@ public class AndroidRDPActivity extends Activity {
 		Log.v(TAG, "width : "+width);
 		Log.v(TAG, "height : "+height);
 		Log.v(TAG, "data length : "+data.length);
+		
 		Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-		final ImageView view = new ImageView(this);
-		LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT);
-		view.setLayoutParams(params);
-		view.setImageBitmap(bitmap);
-		runOnUiThread(new Runnable(){
-
-			@Override
-			public void run() {
-				setContentView(view);
-			}
-			
-		});
+//		final ImageView view = new ImageView(this);
+//		LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT);
+//		view.setLayoutParams(params);
+//		view.setImageBitmap(bitmap);
+//		runOnUiThread(new Runnable(){
+//
+//			@Override
+//			public void run() {
+//				setContentView(view);
+//			}
+//			
+//		});
 		
 	}
 	
