@@ -26,7 +26,7 @@ public class AndroidRDPActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		imageView = (ImageView) findViewById(R.id.image);
-		imageView.setImageResource(R.drawable.test);
+		imageView.setImageResource(R.drawable.icon);
 		setUsername("kidfolk");
 		setPassword("xwjshow");
 		rdpdr_init();
