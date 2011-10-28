@@ -1,4 +1,4 @@
-package org.kidfolk.androidRDP;
+package com.koutongremote;
 
 import android.content.Context;
 import android.graphics.Bitmap;

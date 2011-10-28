@@ -1,4 +1,4 @@
-package org.kidfolk.androidRDP;
+package com.koutongremote;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7,6 +7,8 @@ import java.io.OutputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Date;
+
+import org.kidfolk.androidRDP.R;
 
 import android.app.Activity;
 import android.graphics.Bitmap;

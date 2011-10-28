@@ -12,7 +12,7 @@
 #include <string.h>
 #include "rdesktop.h"
 #include "ssl.h"
-#include "org_kidfolk_androidRDP_AndroidRDPActivity.h"
+#include "com_koutongremote_AndroidRDPActivity.h"
 #include <android/log.h>
 
 char *g_username;
@@ -64,7 +64,12 @@ uint32 ext_disc_reason = 0;
 JNIEnv *genv;
 jobject *gobj;
 
-JNIEXPORT jstring JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_getenv(JNIEnv *env, jobject obj)
+/*
+ * Class:     com_koutongremote_AndroidRDPActivity
+ * Method:    getenv
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_koutongremote_AndroidRDPActivity_getenv(JNIEnv *env, jobject obj)
 {
     __android_log_print(ANDROID_LOG_INFO, "JNIMsg", "getenv");
     return (*env)->NewStringUTF(env, getenv("EXTERNAL_STORAGE"));
@@ -75,7 +80,7 @@ JNIEXPORT jstring JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_getenv(
  * Method:    setUsername
  * Signature: (Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setUsername(JNIEnv *env, jobject obj, jstring username)
+JNIEXPORT void JNICALL Java_com_koutongremote_AndroidRDPActivity_setUsername(JNIEnv *env, jobject obj, jstring username)
 {
 //    g_username = (char *) xmalloc(strlen(username) + 1);
 //    STRNCPY(g_username, username, sizeof(g_username));
@@ -90,7 +95,7 @@ JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setUsernam
  * Method:    setPassword
  * Signature: (Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setPassword(JNIEnv *env, jobject obj, jstring jpassword)
+JNIEXPORT void JNICALL Java_com_koutongremote_AndroidRDPActivity_setPassword(JNIEnv *env, jobject obj, jstring jpassword)
 {
     const char *str = (*env)->GetStringUTFChars(env,jpassword,NULL);
     password = (char *) xmalloc(strlen(str) + 1);
@@ -98,7 +103,7 @@ JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setPasswor
     //__android_log_print(ANDROID_LOG_INFO, "JNIMsg", "setPassword:%s",str);
 }
 
-JNIEXPORT jint JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1connect(JNIEnv *env, jobject obj, jstring jserver, jint flags, jstring domain, jstring jpassword, jstring shell, jstring directory, jboolean g_redirect)
+JNIEXPORT jint JNICALL Java_com_koutongremote_AndroidRDPActivity_rdp_1connect(JNIEnv *env, jobject obj, jstring jserver, jint flags, jstring domain, jstring jpassword, jstring shell, jstring directory, jboolean g_redirect)
 {
     genv = env;
     gobj = obj;
@@ -120,7 +125,7 @@ JNIEXPORT jint JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1conne
  * Method:    rdpdr_init
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdpdr_1init(JNIEnv *env, jobject obj)
+JNIEXPORT jint JNICALL Java_com_koutongremote_AndroidRDPActivity_rdpdr_1init(JNIEnv *env, jobject obj)
 {
     __android_log_print(ANDROID_LOG_INFO,"JNIMsg","rdpdr_1init");
     rdpdr_init();
@@ -132,7 +137,7 @@ JNIEXPORT jint JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdpdr_1ini
  * Method:    rdp_main_loop
  * Signature: (II)V
  */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1main_1loop(JNIEnv *env, jobject obj)
+JNIEXPORT void JNICALL Java_com_koutongremote_AndroidRDPActivity_rdp_1main_1loop(JNIEnv *env, jobject obj)
 {
     rdp_main_loop(&deactivated, &ext_disc_reason);
 }
@@ -142,7 +147,7 @@ JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1main_
  * Method:    rdp_disconnect
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1disconnect(JNIEnv *env, jobject obj)
+JNIEXPORT void JNICALL Java_com_koutongremote_AndroidRDPActivity_rdp_1disconnect(JNIEnv *env, jobject obj)
 {
 
     rdp_disconnect();
@@ -153,7 +158,7 @@ JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1disco
  * Method:    rdp_reset_state
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1reset_1state
+JNIEXPORT void JNICALL Java_com_koutongremote_AndroidRDPActivity_rdp_1reset_1state
 (JNIEnv * env, jobject obj)
 {
     rdp_reset_state();
@@ -164,7 +169,7 @@ JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1reset
  * Method:    cache_save_state
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_cache_1save_1state
+JNIEXPORT void JNICALL Java_com_koutongremote_AndroidRDPActivity_cache_1save_1state
 (JNIEnv * env, jobject obj)
 {
     cache_save_state();
@@ -176,7 +181,7 @@ JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_cache_1sav
  * Method:    rdp_send_client_window_status
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1send_1client_1window_1status
+JNIEXPORT void JNICALL Java_com_koutongremote_AndroidRDPActivity_rdp_1send_1client_1window_1status
 (JNIEnv *env, jobject obj, jint status)
 {
     __android_log_print(ANDROID_LOG_INFO,"JNIMsg","Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1send_1client_1window_1status");
@@ -188,7 +193,7 @@ JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1send_
  * Method:    rdp_send_input
  * Signature: (ISSSS)V
  */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1send_1input
+JNIEXPORT void JNICALL Java_com_koutongremote_AndroidRDPActivity_rdp_1send_1input
 (JNIEnv *env, jobject obj, jint time, jshort message_type, jshort device_flags, jshort param1, jshort param2)
 {
     rdp_send_input(time,message_type,device_flags,param1,param2);
