@@ -197,17 +197,22 @@ JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1send_
 void android_bitmap_creater(int x,int y,int cx,int cy,int width,int height,uint8 *data)
 {
     jclass cls = (*genv)->GetObjectClass(genv, gobj);
-    jmethodID mid = (*genv)->GetMethodID(genv,cls,"getBitmapBytesFormNative","(IIII[B)V");
+    jmethodID mid = (*genv)->GetMethodID(genv,cls,"renderBitmap","(IIIIII[B)V");
     if (mid == NULL) {
         return; /* method not found */
     }
-    jint size = strlen(data);
-    jbyteArray bArray = (*genv)->NewByteArray(genv,size);
-    memcpy(bArray,data,size);
-    //jstring s = (*genv)->NewString(genv,data, size);
-    __android_log_print(ANDROID_LOG_INFO,"JNIMsg","android_bitmap_creater(x=%d,y=%d,cx=%d,cy=%d,width=%d,height=%d,data=%d)",x, y, cx, cy, width, height,strlen(data));
-    (*genv)->CallVoidMethod(genv, gobj, mid,x,y,width,height,bArray);
-    __android_log_print(ANDROID_LOG_INFO,"JNIMsg","android_bitmap_creater(x=%d,y=%d,cx=%d,cy=%d,width=%d,height=%d,data=%p)",x, y, cx, cy, width, height,data);
+    int length = strlen(data);
+    jbyteArray arr = (*genv)->NewByteArray(genv,length);
+    (*genv)->SetByteArrayRegion(genv,arr,0,length,(jbyte*)data);
+    //(*genv)->GetByteArrayRegion(genv,arr,0,length,(jbyte*)data);
+//    jboolean isCopy;
+//    jbyte * buffer = (*genv)->GetByteArrayElements(genv, data, &isCopy);
+//    jsize length = (*genv)->GetArrayLength(genv,data);
+    __android_log_print(ANDROID_LOG_INFO,"JNIMsg","android_bitmap_creater(x=%d,y=%d,cx=%d,cy=%d,width=%d,height=%d,data.length=%d)",x, y, cx, cy, width, height,length);
+    if(length!=0){
+        (*genv)->CallVoidMethod(genv, gobj, mid,x,y,cx,cy,width,height,arr);
+    }
+    (*genv)->ReleaseByteArrayElements(genv,arr,(jbyte*)data,0);
 
 }
 

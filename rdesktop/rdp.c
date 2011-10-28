@@ -1176,6 +1176,7 @@ void process_bitmap_updates(STREAM s) {
 		in_uint16_le(s, height);
 		in_uint16_le(s, bpp);
 		Bpp = (bpp + 7) / 8;
+        //Bpp = 4;
 		in_uint16_le(s, compress);
 		in_uint16_le(s, bufsize);
 

@@ -965,6 +965,7 @@ process_bmpcache(STREAM s)
 	in_uint8(s, height);
 	in_uint8(s, bpp);
 	Bpp = (bpp + 7) / 8;
+    //Bpp = 4;
 	in_uint16_le(s, bufsize);	/* bufsize */
 	in_uint16_le(s, cache_idx);
 

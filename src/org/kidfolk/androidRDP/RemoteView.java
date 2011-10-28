@@ -1,7 +1,10 @@
 package org.kidfolk.androidRDP;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -29,10 +32,9 @@ public class RemoteView extends ImageView {
 	protected void onDraw(Canvas canvas) {
 		// TODO Auto-generated method stub
 		super.onDraw(canvas);
-		Drawable drawable = getResources().getDrawable(R.drawable.test);
-		//Drawable drawable = Drawable.createFromStream(bais, "test.png");
-		drawable.draw(canvas);
+		
 	}
+	
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
