@@ -5,3 +5,4 @@ libs/
 *.properties
 .project
 .classpath
+res/drawable-mdpi/test.png
