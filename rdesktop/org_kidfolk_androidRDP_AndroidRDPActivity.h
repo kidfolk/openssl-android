@@ -9,6 +9,14 @@ extern "C" {
 #endif
 /*
  * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
+ * Method:    setResolution
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setResolution
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
  * Method:    getenv
  * Signature: ()Ljava/lang/String;
  */
@@ -94,14 +102,6 @@ JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1send_
  */
 JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1send_1input
   (JNIEnv *, jobject, jint, jshort, jshort, jshort, jshort);
-
-/*
- * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
- * Method:    renderBitmap
- * Signature: (Landroid/graphics/Bitmap;)V
- */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_renderBitmap
-  (JNIEnv *, jobject, jobject);
 
 #ifdef __cplusplus
 }

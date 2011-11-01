@@ -16,13 +16,12 @@
 #include <android/log.h>
 
 char *g_username;
-//char password[64];
 char *password;
 char g_hostname[16];
 
 RD_BOOL g_bitmap_cache = True;
 RD_BOOL g_bitmap_cache_persist_enable = False;
-int g_server_depth = -1;
+int g_server_depth = 16;
 RD_BOOL g_bitmap_cache_precache = True;
 RD_BOOL g_encryption = True;
 RD_BOOL g_use_rdp5 = True;
@@ -57,164 +56,10 @@ int g_keyboard_subtype = 0x0; /* Defaults to US keyboard layout */
 int g_keyboard_functionkeys = 0xc; /* Defaults to US keyboard layout */
 
 RD_BOOL g_console_session = False;
+RD_BOOL g_numlock_sync = False;
 
 RD_BOOL deactivated;
 uint32 ext_disc_reason = 0;
-
-JNIEnv *genv;
-jobject *gobj;
-
-JNIEXPORT jstring JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_getenv(JNIEnv *env, jobject obj)
-{
-    __android_log_print(ANDROID_LOG_INFO, "JNIMsg", "getenv");
-    return (*env)->NewStringUTF(env, getenv("EXTERNAL_STORAGE"));
-}
-
-/*
- * Class:     org_kidfolk_androidRDP_RdesktopNative
- * Method:    setUsername
- * Signature: (Ljava/lang/String;)V
- */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setUsername(JNIEnv *env, jobject obj, jstring username)
-{
-//    g_username = (char *) xmalloc(strlen(username) + 1);
-//    STRNCPY(g_username, username, sizeof(g_username));
-    const char *nativeString = (*env)->GetStringUTFChars(env,username,NULL);
-    g_username = (char *) xmalloc(strlen(nativeString) + 1);
-    STRNCPY(g_username,nativeString,strlen(nativeString)+1);
-    //__android_log_print(ANDROID_LOG_INFO, "JNIMsg", "setUsername:%s",g_username);
-}
-
-/*
- * Class:     org_kidfolk_androidRDP_RdesktopNative
- * Method:    setPassword
- * Signature: (Ljava/lang/String;)V
- */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setPassword(JNIEnv *env, jobject obj, jstring jpassword)
-{
-    const char *str = (*env)->GetStringUTFChars(env,jpassword,NULL);
-    password = (char *) xmalloc(strlen(str) + 1);
-    STRNCPY(password,str,strlen(str)+1);
-    //__android_log_print(ANDROID_LOG_INFO, "JNIMsg", "setPassword:%s",str);
-}
-
-JNIEXPORT jint JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1connect(JNIEnv *env, jobject obj, jstring jserver, jint flags, jstring domain, jstring jpassword, jstring shell, jstring directory, jboolean g_redirect)
-{
-    genv = env;
-    gobj = obj;
-    __android_log_print(ANDROID_LOG_INFO,"JNIMsg","rdp_1connect");
-    int result = 1;
-    const char *nativeServer = (*env)->GetStringUTFChars(env,jserver,NULL);
-    char *server = (char *) xmalloc(strlen(nativeServer)+1);
-    STRNCPY(server,nativeServer,strlen(nativeServer)+1);
-    //__android_log_print(ANDROID_LOG_INFO,"JNIMsg","rdp_1connect server:%s",server);
-    //__android_log_print(ANDROID_LOG_INFO,"JNIMsg","rdp_1connect username:%s",g_username);
-    //__android_log_print(ANDROID_LOG_INFO,"JNIMsg","rdp_1connect password:%s",password);
-    result = rdp_connect(server,flags,domain,password,shell,directory,g_redirect);
-    return result;
-
-}
-
-/*
- * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
- * Method:    rdpdr_init
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdpdr_1init(JNIEnv *env, jobject obj)
-{
-    __android_log_print(ANDROID_LOG_INFO,"JNIMsg","rdpdr_1init");
-    rdpdr_init();
-
-}
-
-/*
- * Class:     org_kidfolk_androidRDP_RdesktopNative
- * Method:    rdp_main_loop
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1main_1loop(JNIEnv *env, jobject obj)
-{
-    rdp_main_loop(&deactivated, &ext_disc_reason);
-}
-
-/*
- * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
- * Method:    rdp_disconnect
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1disconnect(JNIEnv *env, jobject obj)
-{
-
-    rdp_disconnect();
-}
-
-/*
- * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
- * Method:    rdp_reset_state
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1reset_1state
-(JNIEnv * env, jobject obj)
-{
-    rdp_reset_state();
-}
-
-/*
- * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
- * Method:    cache_save_state
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_cache_1save_1state
-(JNIEnv * env, jobject obj)
-{
-    cache_save_state();
-
-}
-
-/*
- * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
- * Method:    rdp_send_client_window_status
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1send_1client_1window_1status
-(JNIEnv *env, jobject obj, jint status)
-{
-    __android_log_print(ANDROID_LOG_INFO,"JNIMsg","Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1send_1client_1window_1status");
-    rdp_send_client_window_status(status);
-}
-
-/*
- * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
- * Method:    rdp_send_input
- * Signature: (ISSSS)V
- */
-JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1send_1input
-(JNIEnv *env, jobject obj, jint time, jshort message_type, jshort device_flags, jshort param1, jshort param2)
-{
-    rdp_send_input(time,message_type,device_flags,param1,param2);
-}
-
-void android_bitmap_creater(int x,int y,int cx,int cy,int width,int height,uint8 *data)
-{
-    jclass cls = (*genv)->GetObjectClass(genv, gobj);
-    jmethodID mid = (*genv)->GetMethodID(genv,cls,"renderBitmap","(IIIIII[B)V");
-    if (mid == NULL) {
-        return; /* method not found */
-    }
-    int length = strlen(data);
-    jbyteArray arr = (*genv)->NewByteArray(genv,length);
-    (*genv)->SetByteArrayRegion(genv,arr,0,length,(jbyte*)data);
-    //(*genv)->GetByteArrayRegion(genv,arr,0,length,(jbyte*)data);
-//    jboolean isCopy;
-//    jbyte * buffer = (*genv)->GetByteArrayElements(genv, data, &isCopy);
-//    jsize length = (*genv)->GetArrayLength(genv,data);
-    __android_log_print(ANDROID_LOG_INFO,"JNIMsg","android_bitmap_creater(x=%d,y=%d,cx=%d,cy=%d,width=%d,height=%d,data.length=%d)",x, y, cx, cy, width, height,length);
-    if(length!=0){
-        (*genv)->CallVoidMethod(genv, gobj, mid,x,y,cx,cy,width,height,arr);
-    }
-    (*genv)->ReleaseByteArrayElements(genv,arr,(jbyte*)data,0);
-
-}
 
 /* report an unimplemented protocol feature */
 void unimpl(char *format, ...)

@@ -977,7 +977,7 @@ static void rdp_process_bitmap_caps(STREAM s) {
 				g_height, width, height);
 		g_width = width;
 		g_height = height;
-		// TODO ui_resize_window();
+		//ui_resize_window();
 	}
 }
 
@@ -1036,7 +1036,7 @@ static void process_demand_active(STREAM s) {
 	rdp_recv(&type); /* RDP_PDU_SYNCHRONIZE */
 	rdp_recv(&type); /* RDP_CTL_COOPERATE */
 	rdp_recv(&type); /* RDP_CTL_GRANT_CONTROL */
-	//TODO rdp_send_input(0, RDP_INPUT_SYNCHRONIZE, 0,
+	//rdp_send_input(0, RDP_INPUT_SYNCHRONIZE, 0,
 			//g_numlock_sync ? ui_get_numlock_state(read_keyboard_state()) : 0,
 			//0);
 
@@ -1078,8 +1078,8 @@ static void process_colour_pointer_common(STREAM s, int bpp) {
 	x = MIN(x, width - 1);
 	y = MAX(y, 0);
 	y = MIN(y, height - 1);
-	// TODO cursor = ui_create_cursor(x, y, width, height, mask, data, bpp);
-	// TODO ui_set_cursor(cursor);
+	cursor = ui_create_cursor(x, y, width, height, mask, data, bpp);
+	ui_set_cursor(cursor);
 	cache_put_cursor(cache_idx, cursor);
 }
 
@@ -1101,7 +1101,7 @@ void process_cached_pointer_pdu(STREAM s) {
 	uint16 cache_idx;
 
 	in_uint16_le(s, cache_idx);
-	// TODO ui_set_cursor(cache_get_cursor(cache_idx));
+	//ui_set_cursor(cache_get_cursor(cache_idx));
 }
 
 /* Process a system pointer PDU */
@@ -1111,7 +1111,7 @@ void process_system_pointer_pdu(STREAM s) {
 	in_uint16_le(s, system_pointer_type);
 	switch (system_pointer_type) {
 	case RDP_NULL_POINTER:
-		// TODO ui_set_null_cursor();
+		//ui_set_null_cursor();
 		break;
 
 	default:
@@ -1133,7 +1133,7 @@ static void process_pointer_pdu(STREAM s) {
 		in_uint16_le(s, x);
 		in_uint16_le(s, y);
 		if (s_check(s))
-			// TODO ui_move_pointer(x, y);
+			//ui_move_pointer(x, y);
 		break;
 
 	case RDP_POINTER_COLOR:
@@ -1243,8 +1243,8 @@ void process_palette(STREAM s) {
 		in_uint8(s, entry->blue);
 	}
 
-	// TODO hmap = ui_create_colourmap(&map);
-	// TODO ui_set_colourmap(hmap);
+//	hmap = ui_create_colourmap(&map);
+//	ui_set_colourmap(hmap);
 
 	xfree(map.colours);
 }
@@ -1255,7 +1255,7 @@ static void process_update_pdu(STREAM s) {
 
 	in_uint16_le(s, update_type);
 
-	// TODO ui_begin_update();
+	//ui_begin_update();
     __android_log_print(ANDROID_LOG_INFO,"JNIMsg","process_update_pdu STREAM:%p",s);
 	switch (update_type) {
 	case RDP_UPDATE_ORDERS:
@@ -1281,7 +1281,7 @@ static void process_update_pdu(STREAM s) {
 	default:
 		unimpl("update %d\n", update_type);
 	}
-	// TODO ui_end_update();
+	//ui_end_update();
 }
 
 /* Process a Save Session Info PDU */
@@ -1396,7 +1396,7 @@ static RD_BOOL process_data_pdu(STREAM s, uint32 * ext_disc_reason) {
 		break;
 
 	case RDP_DATA_PDU_BELL:
-		// TODO ui_bell();
+		//ui_bell();
 		break;
 
 	case RDP_DATA_PDU_LOGON:

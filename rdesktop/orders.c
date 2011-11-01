@@ -326,7 +326,7 @@ process_line(STREAM s, LINE_ORDER * os, uint32 present, RD_BOOL delta)
 		return;
 	}
 
-	// TODO ui_line(os->opcode - 1, os->startx, os->starty, os->endx, os->endy, &os->pen);
+	ui_line(os->opcode - 1, os->startx, os->starty, os->endx, os->endy, &os->pen);
 }
 
 /* Process an opaque rectangle order */
@@ -366,7 +366,7 @@ process_rect(STREAM s, RECT_ORDER * os, uint32 present, RD_BOOL delta)
 
 	DEBUG(("RECT(x=%d,y=%d,cx=%d,cy=%d,fg=0x%x)\n", os->x, os->y, os->cx, os->cy, os->colour));
 
-	// TODO ui_rect(os->x, os->y, os->cx, os->cy, os->colour);
+	ui_rect(os->x, os->y, os->cx, os->cy, os->colour);
 }
 
 /* Process a desktop save order */
@@ -448,7 +448,7 @@ process_memblt(STREAM s, MEMBLT_ORDER * os, uint32 present, RD_BOOL delta)
 	if (bitmap == NULL)
 		return;
 
-	// TODO ui_memblt(ROP2_S(os->opcode), os->x, os->y, os->cx, os->cy, bitmap, os->srcx, os->srcy);
+	ui_memblt(ROP2_S(os->opcode), os->x, os->y, os->cx, os->cy, bitmap, os->srcx, os->srcy);
 }
 
 /* Process a 3-way blt order */
@@ -509,8 +509,8 @@ process_triblt(STREAM s, TRIBLT_ORDER * os, uint32 present, RD_BOOL delta)
 
 	setup_brush(&brush, &os->brush);
 
-	// TODO ui_triblt(os->opcode, os->x, os->y, os->cx, os->cy,
-		  //bitmap, os->srcx, os->srcy, &brush, os->bgcolour, os->fgcolour);
+	ui_triblt(os->opcode, os->x, os->y, os->cx, os->cy,
+		  bitmap, os->srcx, os->srcy, &brush, os->bgcolour, os->fgcolour);
 }
 
 /* Process a polygon order */
@@ -941,7 +941,7 @@ process_raw_bmpcache(STREAM s)
 		       width * Bpp);
 	}
 
-	// TODO bitmap = ui_create_bitmap(width, height, inverted);
+	bitmap = ui_create_bitmap(width, height, inverted);
 	xfree(inverted);
 	cache_put_bitmap(cache_id, cache_idx, bitmap);
 }
@@ -992,7 +992,7 @@ process_bmpcache(STREAM s)
 
 	if (bitmap_decompress(bmpdata, width, height, data, size, Bpp))
 	{
-		// TODO bitmap = ui_create_bitmap(width, height, bmpdata);
+		bitmap = ui_create_bitmap(width, height, bmpdata);
 		cache_put_bitmap(cache_id, cache_idx, bitmap);
 	}
 	else
@@ -1066,7 +1066,7 @@ process_bmpcache2(STREAM s, uint16 flags, RD_BOOL compressed)
 			       &data[y * (width * Bpp)], width * Bpp);
 	}
 
-	// TODO bitmap = ui_create_bitmap(width, height, bmpdata);
+	bitmap = ui_create_bitmap(width, height, bmpdata);
 
 	if (bitmap)
 	{
@@ -1143,7 +1143,7 @@ process_fontcache(STREAM s)
 		datasize = (height * ((width + 7) / 8) + 3) & ~3;
 		in_uint8p(s, data, datasize);
 
-		// TODO bitmap = ui_create_glyph(width, height, data);
+		bitmap = ui_create_glyph(width, height, data);
 		cache_put_font(font, character, offset, baseline, width, height, bitmap);
 	}
 }

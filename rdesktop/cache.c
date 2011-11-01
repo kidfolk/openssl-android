@@ -165,7 +165,7 @@ void cache_evict_bitmap(uint8 id) {
 	DEBUG_RDP5(("evict bitmap: id=%d idx=%d n_idx=%d bmp=%p\n", id, idx, n_idx,
 					g_bmpcache[id][idx].bitmap));
 
-	// TODO ui_destroy_bitmap(g_bmpcache[id][idx].bitmap);
+	ui_destroy_bitmap(g_bmpcache[id][idx].bitmap);
 	--g_bmpcache_count[id];
 	g_bmpcache[id][idx].bitmap = 0;
 
@@ -202,7 +202,7 @@ void cache_put_bitmap(uint8 id, uint16 idx, RD_HBITMAP bitmap) {
 		old = g_bmpcache[id][idx].bitmap;
 		if (old != NULL
 			)
-			// TODO ui_destroy_bitmap(old);
+			ui_destroy_bitmap(old);
 		g_bmpcache[id][idx].bitmap = bitmap;
 
 		if (IS_PERSISTENT(id)) {
@@ -220,7 +220,7 @@ void cache_put_bitmap(uint8 id, uint16 idx, RD_HBITMAP bitmap) {
 		old = g_volatile_bc[id];
 		if (old != NULL
 			)
-			// TODO ui_destroy_bitmap(old);
+			ui_destroy_bitmap(old);
 		g_volatile_bc[id] = bitmap;
 	} else {
 		error("put bitmap %d:%d\n", id, idx);
@@ -273,7 +273,7 @@ void cache_put_font(uint8 font, uint16 character, uint16 offset,
 		glyph = &g_fontcache[font][character];
 		if (glyph->pixmap != NULL
 			)
-			// TODO ui_destroy_glyph(glyph->pixmap);
+			ui_destroy_glyph(glyph->pixmap);
 
 		glyph->offset = offset;
 		glyph->baseline = baseline;
