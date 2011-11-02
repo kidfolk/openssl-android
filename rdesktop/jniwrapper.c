@@ -11,7 +11,7 @@ extern char *password;
 extern RD_BOOL deactivated;
 extern uint32 ext_disc_reason;
 
-uint32 g_last_gesturetime;
+
 
 JavaVM *cached_jvm;
 JNIEnv *cached_env;
