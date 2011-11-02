@@ -218,7 +218,7 @@ process_destblt(STREAM s, DESTBLT_ORDER * os, uint32 present, RD_BOOL delta)
 	DEBUG(("DESTBLT(op=0x%x,x=%d,y=%d,cx=%d,cy=%d)\n",
 	       os->opcode, os->x, os->y, os->cx, os->cy));
 
-	// TODO ui_destblt(ROP2_S(os->opcode), os->x, os->y, os->cx, os->cy);
+	ui_destblt(ROP2_S(os->opcode), os->x, os->y, os->cx, os->cy);
 }
 
 /* Process a pattern blt order */
@@ -255,8 +255,8 @@ process_patblt(STREAM s, PATBLT_ORDER * os, uint32 present, RD_BOOL delta)
 
 	setup_brush(&brush, &os->brush);
 
-	// TODO ui_patblt(ROP2_P(os->opcode), os->x, os->y, os->cx, os->cy,
-		  //&brush, os->bgcolour, os->fgcolour);
+	ui_patblt(ROP2_P(os->opcode), os->x, os->y, os->cx, os->cy,
+		  &brush, os->bgcolour, os->fgcolour);
 }
 
 /* Process a screen blt order */
@@ -287,7 +287,7 @@ process_screenblt(STREAM s, SCREENBLT_ORDER * os, uint32 present, RD_BOOL delta)
 	DEBUG(("SCREENBLT(op=0x%x,x=%d,y=%d,cx=%d,cy=%d,srcx=%d,srcy=%d)\n",
 	       os->opcode, os->x, os->y, os->cx, os->cy, os->srcx, os->srcy));
 
-	// TODO ui_screenblt(ROP2_S(os->opcode), os->x, os->y, os->cx, os->cy, os->srcx, os->srcy);
+	ui_screenblt(ROP2_S(os->opcode), os->x, os->y, os->cx, os->cy, os->srcx, os->srcy);
 }
 
 /* Process a line order */
@@ -399,10 +399,10 @@ process_desksave(STREAM s, DESKSAVE_ORDER * os, uint32 present, RD_BOOL delta)
 	width = os->right - os->left + 1;
 	height = os->bottom - os->top + 1;
 
-	//if (os->action == 0)
-		// TODO ui_desktop_save(os->offset, os->left, os->top, width, height);
-	//else
-		// TODO ui_desktop_restore(os->offset, os->left, os->top, width, height);
+	if (os->action == 0)
+		ui_desktop_save(os->offset, os->left, os->top, width, height);
+	else
+		ui_desktop_restore(os->offset, os->left, os->top, width, height);
 }
 
 /* Process a memory blt order */
@@ -583,11 +583,11 @@ process_polygon(STREAM s, POLYGON_ORDER * os, uint32 present, RD_BOOL delta)
 		flags <<= 2;
 	}
 
-	//if (next - 1 == os->npoints)
-		// TODO ui_polygon(os->opcode - 1, os->fillmode, points, os->npoints + 1, NULL, 0,
-			   //os->fgcolour);
-	//else
-		//error("polygon parse error\n");
+	if (next - 1 == os->npoints)
+		ui_polygon(os->opcode - 1, os->fillmode, points, os->npoints + 1, NULL, 0,
+			   os->fgcolour);
+	else
+		error("polygon parse error\n");
 
 	xfree(points);
 }
@@ -671,11 +671,11 @@ process_polygon2(STREAM s, POLYGON2_ORDER * os, uint32 present, RD_BOOL delta)
 		flags <<= 2;
 	}
 
-	//if (next - 1 == os->npoints)
-		// TODO ui_polygon(os->opcode - 1, os->fillmode, points, os->npoints + 1,
-			  // &brush, os->bgcolour, os->fgcolour);
-	//else
-		//error("polygon2 parse error\n");
+	if (next - 1 == os->npoints)
+		ui_polygon(os->opcode - 1, os->fillmode, points, os->npoints + 1,
+			   &brush, os->bgcolour, os->fgcolour);
+	else
+		error("polygon2 parse error\n");
 
 	xfree(points);
 }
@@ -750,10 +750,10 @@ process_polyline(STREAM s, POLYLINE_ORDER * os, uint32 present, RD_BOOL delta)
 		flags <<= 2;
 	}
 
-	//if (next - 1 == os->lines)
-		// TODO ui_polyline(os->opcode - 1, points, os->lines + 1, &pen);
-	//else
-		//error("polyline parse error\n");
+	if (next - 1 == os->lines)
+		ui_polyline(os->opcode - 1, points, os->lines + 1, &pen);
+	else
+		error("polyline parse error\n");
 
 	xfree(points);
 }
@@ -786,8 +786,8 @@ process_ellipse(STREAM s, ELLIPSE_ORDER * os, uint32 present, RD_BOOL delta)
 	DEBUG(("ELLIPSE(l=%d,t=%d,r=%d,b=%d,op=0x%x,fm=%d,fg=0x%x)\n", os->left, os->top,
 	       os->right, os->bottom, os->opcode, os->fillmode, os->fgcolour));
 
-	// TODO ui_ellipse(os->opcode - 1, os->fillmode, os->left, os->top, os->right - os->left,
-		   //os->bottom - os->top, NULL, 0, os->fgcolour);
+	ui_ellipse(os->opcode - 1, os->fillmode, os->left, os->top, os->right - os->left,
+		   os->bottom - os->top, NULL, 0, os->fgcolour);
 }
 
 /* Process an ellipse2 order */
@@ -828,8 +828,8 @@ process_ellipse2(STREAM s, ELLIPSE2_ORDER * os, uint32 present, RD_BOOL delta)
 
 	setup_brush(&brush, &os->brush);
 
-	// TODO ui_ellipse(os->opcode - 1, os->fillmode, os->left, os->top, os->right - os->left,
-		   //os->bottom - os->top, &brush, os->bgcolour, os->fgcolour);
+	ui_ellipse(os->opcode - 1, os->fillmode, os->left, os->top, os->right - os->left,
+		   os->bottom - os->top, &brush, os->bgcolour, os->fgcolour);
 }
 
 /* Process a text order */
@@ -906,11 +906,11 @@ process_text2(STREAM s, TEXT2_ORDER * os, uint32 present, RD_BOOL delta)
 
 	setup_brush(&brush, &os->brush);
 
-	// TODO ui_draw_text(os->font, os->flags, os->opcode - 1, os->mixmode, os->x, os->y,
-		     //os->clipleft, os->cliptop, os->clipright - os->clipleft,
-		     //os->clipbottom - os->cliptop, os->boxleft, os->boxtop,
-		     //os->boxright - os->boxleft, os->boxbottom - os->boxtop,
-		     //&brush, os->bgcolour, os->fgcolour, os->text, os->length);
+	ui_draw_text(os->font, os->flags, os->opcode - 1, os->mixmode, os->x, os->y,
+		     os->clipleft, os->cliptop, os->clipright - os->clipleft,
+		     os->clipbottom - os->cliptop, os->boxleft, os->boxtop,
+		     os->boxright - os->boxleft, os->boxbottom - os->boxtop,
+		     &brush, os->bgcolour, os->fgcolour, os->text, os->length);
 }
 
 /* Process a raw bitmap cache order */
@@ -1109,10 +1109,10 @@ process_colcache(STREAM s)
 
 	DEBUG(("COLCACHE(id=%d,n=%d)\n", cache_id, map.ncolours));
 
-	// TODO hmap = ui_create_colourmap(&map);
+	hmap = ui_create_colourmap(&map);
 
 	if (cache_id)
-		// TODO ui_set_colourmap(hmap);
+		ui_set_colourmap(hmap);
 
 	xfree(map.colours);
 }
@@ -1362,11 +1362,11 @@ process_orders(STREAM s, uint16 num_orders)
 				if (!(order_flags & RDP_ORDER_LASTBOUNDS))
 					rdp_parse_bounds(s, &os->bounds);
 
-				// TODO ui_set_clip(os->bounds.left,
-					    //os->bounds.top,
-					    //os->bounds.right -
-					    //os->bounds.left + 1,
-					    //os->bounds.bottom - os->bounds.top + 1);
+				ui_set_clip(os->bounds.left,
+					    os->bounds.top,
+					    os->bounds.right -
+					    os->bounds.left + 1,
+					    os->bounds.bottom - os->bounds.top + 1);
 			}
 
 			delta = order_flags & RDP_ORDER_DELTA;
@@ -1434,8 +1434,8 @@ process_orders(STREAM s, uint16 num_orders)
 					return;
 			}
 
-			//if (order_flags & RDP_ORDER_BOUNDS)
-				// TODO ui_reset_clip();
+			if (order_flags & RDP_ORDER_BOUNDS)
+				ui_reset_clip();
 		}
 
 		processed++;

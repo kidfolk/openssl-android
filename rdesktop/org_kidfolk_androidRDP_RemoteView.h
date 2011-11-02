@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     org_kidfolk_androidRDP_RemoteView
  * Method:    native_handle_mouse_button
- * Signature: (JIIII)V
+ * Signature: (IIII)V
  */
 JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_RemoteView_native_1handle_1mouse_1button
-  (JNIEnv *, jobject, jlong, jint, jint, jint, jint);
+  (JNIEnv *, jobject, jint, jint, jint, jint);
 
 #ifdef __cplusplus
 }

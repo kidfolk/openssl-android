@@ -41,6 +41,14 @@ JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setPasswor
 
 /*
  * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
+ * Method:    setServerDepth
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setServerDepth
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
  * Method:    rdp_connect
  * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)I
  */

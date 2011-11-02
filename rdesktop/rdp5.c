@@ -40,7 +40,7 @@ rdp5_process(STREAM s)
 	hexdump(s->p, s->end - s->p);
 #endif
 
-	// TODO ui_begin_update();
+	ui_begin_update();
 	while (s->p < s->end)
 	{
 		in_uint8(s, type);
@@ -94,7 +94,7 @@ rdp5_process(STREAM s)
 			case 3:	/* update synchronize */
 				break;
 			case 5:	/* null pointer */
-				// TODO ui_set_null_cursor();
+				ui_set_null_cursor();
 				break;
 			case 6:	/* default pointer */
 				break;
@@ -102,7 +102,7 @@ rdp5_process(STREAM s)
 				in_uint16_le(ts, x);
 				in_uint16_le(ts, y);
 				if (s_check(ts))
-					// TODO ui_move_pointer(x, y);
+					ui_move_pointer(x, y);
 				break;
 			case 9:	/* color pointer */
 				process_colour_pointer_pdu(ts);
@@ -119,5 +119,5 @@ rdp5_process(STREAM s)
 
 		s->p = next;
 	}
-	// TODO ui_end_update();
+	ui_end_update();
 }

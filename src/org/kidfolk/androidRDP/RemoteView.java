@@ -40,10 +40,10 @@ public class RemoteView extends ImageView {
 		int action = event.getAction();
 		switch (action) {
 		case MotionEvent.ACTION_DOWN:
-			native_handle_mouse_button(event.getEventTime(),1,(int)event.getRawX(),(int)event.getRawY(),1);
+			native_handle_mouse_button(1,(int)event.getRawX(),(int)event.getRawY(),1);
 			break;
 		case MotionEvent.ACTION_UP:
-			native_handle_mouse_button(event.getEventTime(),1,(int)event.getRawX(),(int)event.getRawY(),0);
+			native_handle_mouse_button(1,(int)event.getRawX(),(int)event.getRawY(),0);
 			break;
 		case MotionEvent.ACTION_MOVE:
 			//native_handle_mouse_move((int)event.getX(),(int)event.getY());
@@ -55,7 +55,7 @@ public class RemoteView extends ImageView {
 	
 	//private native void native_handle_mouse_move(int x,int y);
 
-	private native void native_handle_mouse_button(long time,int button,int x, int y, int down);
+	private native void native_handle_mouse_button(int button,int x, int y, int down);
 
 	private static final String TAG = "RemoteView";
 

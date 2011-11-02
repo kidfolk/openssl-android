@@ -7,9 +7,13 @@ extern int g_height;
 
 extern char *g_username;
 extern char *password;
+extern int g_server_depth;
 
 extern RD_BOOL deactivated;
 extern uint32 ext_disc_reason;
+
+extern RD_BOOL g_packet_encryption;
+extern RD_BOOL g_encryption;
 
 
 
@@ -59,6 +63,17 @@ JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setPasswor
     STRNCPY(password,str,strlen(str)+1);
 }
 
+/*
+ * Class:     org_kidfolk_androidRDP_AndroidRDPActivity
+ * Method:    setServerDepth
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_setServerDepth
+(JNIEnv * env, jobject obj, jint depth)
+{
+    g_server_depth = depth;
+}
+
 JNIEXPORT jint JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1connect(JNIEnv *env, jobject obj, jstring jserver, jint flags, jstring domain, jstring jpassword, jstring shell, jstring directory, jboolean g_redirect)
 {
     cached_env = env;
@@ -68,7 +83,10 @@ JNIEXPORT jint JNICALL Java_org_kidfolk_androidRDP_AndroidRDPActivity_rdp_1conne
     const char *nativeServer = (*env)->GetStringUTFChars(env,jserver,NULL);
     char *server = (char *) xmalloc(strlen(nativeServer)+1);
     STRNCPY(server,nativeServer,strlen(nativeServer)+1);
-    result = rdp_connect(server,RDP_LOGON_AUTO|RDP_LOGON_NORMAL,domain,password,shell,directory,g_redirect);
+    parse_server_and_port(server);
+    result = rdp_connect(server,flags,domain,password,shell,directory,0);
+    if (!g_packet_encryption)
+        g_encryption = False;
     return result;
     
 }
@@ -191,15 +209,26 @@ void android_draw_rect(int x,int y,int cx,int cy,uint32 color)
     (*cached_env)->DeleteLocalRef(cached_env,cls);
 }
 
+void android_set_pixel(int x, int y, int color)
+{
+	jclass cls = (*cached_env)->GetObjectClass(cached_env, cached_obj);
+	jmethodID mid = (*cached_env)->GetMethodID(cached_env,cls,"setPixel","(III)V");
+    if (mid == NULL) {
+        return; /* method not found */
+    }
+	(*cached_env)->CallVoidMethod(cached_env, cached_obj,mid, x, y, color);
+	(*cached_env)->DeleteLocalRef(cached_env, cls);
+}
+
 /*
  * Class:     org_kidfolk_androidRDP_RemoteView
  * Method:    native_handle_mouse_button
  * Signature: (JIIII)V
  */
 JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_RemoteView_native_1handle_1mouse_1button
-(JNIEnv *env, jobject obj, jlong time, jint button, jint x, jint y, jint isdown)
+(JNIEnv *env, jobject obj, jint button, jint x, jint y, jint isdown)
 {
-    handle_button_event((uint32)time,button,x,y,isdown);
+    ui_mouse_button(button,x,y,isdown);
 }
 
 

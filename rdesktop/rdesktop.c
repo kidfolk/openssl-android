@@ -15,22 +15,54 @@
 #include "org_kidfolk_androidRDP_AndroidRDPActivity.h"
 #include <android/log.h>
 
+char g_title[64] = "";
 char *g_username;
 char *password;
 char g_hostname[16];
-
+char g_keymapname[PATH_MAX] = "";
+unsigned int g_keylayout = 0x409; /* Defaults to US keyboard layout */
+int g_keyboard_type = 0x4; /* Defaults to US keyboard layout */
+int g_keyboard_subtype = 0x0; /* Defaults to US keyboard layout */
+int g_keyboard_functionkeys = 0xc; /* Defaults to US keyboard layout */
+int g_sizeopt = 0; /* If non-zero, a special size has been
+                    requested. If 1, the geometry will be fetched
+                    from _NET_WORKAREA. If negative, absolute value
+                    specifies the percent of the whole screen. */
+int g_width = 800;
+int g_height = 600;
+int g_xpos = 0;
+int g_ypos = 0;
+int g_pos = 0; /* 0 position unspecified,
+                1 specified,
+                2 xpos neg,
+                4 ypos neg  */
+extern int g_tcp_port_rdp;
+int g_server_depth = -1;
+int g_win_button_size = 0; /* If zero, disable single app mode */
+RD_BOOL g_bitmap_compression = True;
+RD_BOOL g_sendmotion = True;
 RD_BOOL g_bitmap_cache = True;
 RD_BOOL g_bitmap_cache_persist_enable = False;
-int g_server_depth = 16;
 RD_BOOL g_bitmap_cache_precache = True;
 RD_BOOL g_encryption = True;
+RD_BOOL g_packet_encryption = True;
+RD_BOOL g_desktop_save = True; /* desktop save order */
+RD_BOOL g_polygon_ellipse_orders = True; /* polygon / ellipse orders */
+RD_BOOL g_fullscreen = False;
+RD_BOOL g_grab_keyboard = True;
+RD_BOOL g_hide_decorations = False;
 RD_BOOL g_use_rdp5 = True;
+RD_BOOL g_rdpclip = True;
+RD_BOOL g_console_session = False;
+RD_BOOL g_numlock_sync = False;
+RD_BOOL g_lspci_enabled = False;
+RD_BOOL g_owncolmap = False;
+RD_BOOL g_ownbackstore = True; /* We can't rely on external BackingStore */
+RD_BOOL g_seamless_rdp = False;
+RD_BOOL g_user_quit = False;
+uint32 g_embed_wnd;
 uint32 g_rdp5_performanceflags = RDP5_NO_WALLPAPER | RDP5_NO_FULLWINDOWDRAG
 | RDP5_NO_MENUANIMATIONS;
-RD_BOOL g_has_reconnect_random = False;
-uint32 g_reconnect_logonid = 0;
-char g_reconnect_random[16];
-
 /* Session Directory redirection */
 RD_BOOL g_redirect = False;
 char g_redirect_server[64];
@@ -40,23 +72,11 @@ char *g_redirect_username;
 char g_redirect_cookie[128];
 uint32 g_redirect_flags = 0;
 
+uint32 g_reconnect_logonid = 0;
+char g_reconnect_random[16];
+RD_BOOL g_has_reconnect_random = False;
 uint8 g_client_random[SEC_RANDOM_SIZE];
-
-int g_width = 800;
-int g_height = 600;
-
-RD_BOOL g_bitmap_compression = True;
-RD_BOOL g_desktop_save = True; /* desktop save order */
-RD_BOOL g_polygon_ellipse_orders = True; /* polygon / ellipse orders */
 RD_BOOL g_pending_resize = False;
-
-unsigned int g_keylayout = 0x409; /* Defaults to US keyboard layout */
-int g_keyboard_type = 0x4; /* Defaults to US keyboard layout */
-int g_keyboard_subtype = 0x0; /* Defaults to US keyboard layout */
-int g_keyboard_functionkeys = 0xc; /* Defaults to US keyboard layout */
-
-RD_BOOL g_console_session = False;
-RD_BOOL g_numlock_sync = False;
 
 RD_BOOL deactivated;
 uint32 ext_disc_reason = 0;
@@ -424,4 +444,176 @@ l_to_a(long N, int base) {
     
 	strcpy(head, tail);
 	return ret;
+}
+
+void parse_server_and_port(char *server) {
+	printf("parse_server_and_port\n");
+	char *p;
+#ifdef IPv6
+	int addr_colons;
+#endif
+    
+#ifdef IPv6
+	p = server;
+	addr_colons = 0;
+	while (*p)
+        if (*p++ == ':')
+            addr_colons++;
+	if (addr_colons >= 2)
+	{
+		/* numeric IPv6 style address format - [1:2:3::4]:port */
+		p = strchr(server, ']');
+		if (*server == '[' && p != NULL)
+		{
+			if (*(p + 1) == ':' && *(p + 2) != '\0')
+                g_tcp_port_rdp = strtol(p + 2, NULL, 10);
+			/* remove the port number and brackets from the address */
+			*p = '\0';
+			strncpy(server, server + 1, strlen(server));
+		}
+	}
+	else
+	{
+		/* dns name or IPv4 style address format - server.example.com:port or 1.2.3.4:port */
+		p = strchr(server, ':');
+		if (p != NULL)
+		{
+			g_tcp_port_rdp = strtol(p + 1, NULL, 10);
+			*p = 0;
+		}
+	}
+#else /* no IPv6 support */
+	p = strchr(server, ':');
+	if (p != NULL)
+	{
+		g_tcp_port_rdp = strtol(p + 1, NULL, 10);
+		*p = 0;
+	}
+#endif /* IPv6 */
+    
+}
+
+static int handle_disconnect_reason(RD_BOOL deactivated, uint16 reason) {
+	printf("handle_disconnect_reason\n");
+	char *text;
+	int retval;
+    
+	switch (reason) {
+        case exDiscReasonNoInfo:
+            text = "No information available";
+            if (deactivated)
+                retval = EX_OK;
+            else
+                retval = EXRD_UNKNOWN;
+            break;
+            
+        case exDiscReasonAPIInitiatedDisconnect:
+        case exDiscReasonWindows7Disconnect:
+            text = "Server initiated disconnect";
+            retval = EXRD_API_DISCONNECT;
+            break;
+            
+        case exDiscReasonAPIInitiatedLogoff:
+            text = "Server initiated logoff";
+            retval = EXRD_API_LOGOFF;
+            break;
+            
+        case exDiscReasonServerIdleTimeout:
+            text = "Server idle timeout reached";
+            retval = EXRD_IDLE_TIMEOUT;
+            break;
+            
+        case exDiscReasonServerLogonTimeout:
+            text = "Server logon timeout reached";
+            retval = EXRD_LOGON_TIMEOUT;
+            break;
+            
+        case exDiscReasonReplacedByOtherConnection:
+            text = "The session was replaced";
+            retval = EXRD_REPLACED;
+            break;
+            
+        case exDiscReasonOutOfMemory:
+            text = "The server is out of memory";
+            retval = EXRD_OUT_OF_MEM;
+            break;
+            
+        case exDiscReasonServerDeniedConnection:
+            text = "The server denied the connection";
+            retval = EXRD_DENIED;
+            break;
+            
+        case exDiscReasonServerDeniedConnectionFips:
+            text = "The server denied the connection for security reason";
+            retval = EXRD_DENIED_FIPS;
+            break;
+            
+        case exDiscReasonLicenseInternal:
+            text = "Internal licensing error";
+            retval = EXRD_LIC_INTERNAL;
+            break;
+            
+        case exDiscReasonLicenseNoLicenseServer:
+            text = "No license server available";
+            retval = EXRD_LIC_NOSERVER;
+            break;
+            
+        case exDiscReasonLicenseNoLicense:
+            text = "No valid license available";
+            retval = EXRD_LIC_NOLICENSE;
+            break;
+            
+        case exDiscReasonLicenseErrClientMsg:
+            text = "Invalid licensing message";
+            retval = EXRD_LIC_MSG;
+            break;
+            
+        case exDiscReasonLicenseHwidDoesntMatchLicense:
+            text = "Hardware id doesn't match software license";
+            retval = EXRD_LIC_HWID;
+            break;
+            
+        case exDiscReasonLicenseErrClientLicense:
+            text = "Client license error";
+            retval = EXRD_LIC_CLIENT;
+            break;
+            
+        case exDiscReasonLicenseCantFinishProtocol:
+            text = "Network error during licensing protocol";
+            retval = EXRD_LIC_NET;
+            break;
+            
+        case exDiscReasonLicenseClientEndedProtocol:
+            text = "Licensing protocol was not completed";
+            retval = EXRD_LIC_PROTO;
+            break;
+            
+        case exDiscReasonLicenseErrClientEncryption:
+            text = "Incorrect client license enryption";
+            retval = EXRD_LIC_ENC;
+            break;
+            
+        case exDiscReasonLicenseCantUpgradeLicense:
+            text = "Can't upgrade license";
+            retval = EXRD_LIC_UPGRADE;
+            break;
+            
+        case exDiscReasonLicenseNoRemoteConnections:
+            text = "The server is not licensed to accept remote connections";
+            retval = EXRD_LIC_NOREMOTE;
+            break;
+            
+        default:
+            if (reason > 0x1000 && reason < 0x7fff) {
+                text = "Internal protocol error";
+            } else {
+                text = "Unknown reason";
+            }
+            retval = EXRD_UNKNOWN;
+	}
+	if (reason != exDiscReasonNoInfo
+        )
+		fprintf(stderr, "disconnect: %s.\n", text);
+    
+	return retval;
 }

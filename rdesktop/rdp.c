@@ -85,6 +85,7 @@ static RD_BOOL g_iconv_works = True;
 
 /* Receive an RDP packet */
 static STREAM rdp_recv(uint8 * type) {
+    __android_log_print(ANDROID_LOG_INFO,"JNIMsg","rdp_recv package");
 	static STREAM rdp_s;
 	uint16 length, pdu_type;
 	uint8 rdpver;
@@ -960,24 +961,21 @@ static void rdp_process_bitmap_caps(STREAM s) {
 	in_uint16_le(s, width);
 	in_uint16_le(s, height);
 
-	DEBUG(("setting desktop size and depth to: %dx%dx%d\n", width, height, depth));
+	__android_log_print(ANDROID_LOG_INFO,"JNIMsg","setting desktop size and depth to: %dx%dx%d", width, height, depth);
 
 	/*
 	 * The server may limit depth and change the size of the desktop (for
 	 * example when shadowing another session).
 	 */
 	if (g_server_depth != depth) {
-		warning(
-				"Remote desktop does not support colour depth %d; falling back to %d\n",
-				g_server_depth, depth);
-		g_server_depth = depth;
+        __android_log_print(ANDROID_LOG_WARN,"JNIMsg","Remote desktop does not support colour depth %d; falling back to %d",g_server_depth, depth);
+        g_server_depth = depth;
 	}
 	if (g_width != width || g_height != height) {
-		warning("Remote desktop changed from %dx%d to %dx%d.\n", g_width,
-				g_height, width, height);
+        __android_log_print(ANDROID_LOG_WARN,"JNIMsg","Remote desktop changed from %dx%d to %dx%d.", g_width,g_height, width, height);
 		g_width = width;
 		g_height = height;
-		//ui_resize_window();
+		ui_resize_window();
 	}
 }
 
@@ -1036,9 +1034,9 @@ static void process_demand_active(STREAM s) {
 	rdp_recv(&type); /* RDP_PDU_SYNCHRONIZE */
 	rdp_recv(&type); /* RDP_CTL_COOPERATE */
 	rdp_recv(&type); /* RDP_CTL_GRANT_CONTROL */
-	//rdp_send_input(0, RDP_INPUT_SYNCHRONIZE, 0,
-			//g_numlock_sync ? ui_get_numlock_state(read_keyboard_state()) : 0,
-			//0);
+	rdp_send_input(0, RDP_INPUT_SYNCHRONIZE, 0,
+			g_numlock_sync ? ui_get_numlock_state(read_keyboard_state()) : 0,
+			0);
 
 	if (g_use_rdp5) {
 		rdp_enum_bmpcache2();
@@ -1101,7 +1099,7 @@ void process_cached_pointer_pdu(STREAM s) {
 	uint16 cache_idx;
 
 	in_uint16_le(s, cache_idx);
-	//ui_set_cursor(cache_get_cursor(cache_idx));
+	ui_set_cursor(cache_get_cursor(cache_idx));
 }
 
 /* Process a system pointer PDU */
@@ -1111,7 +1109,7 @@ void process_system_pointer_pdu(STREAM s) {
 	in_uint16_le(s, system_pointer_type);
 	switch (system_pointer_type) {
 	case RDP_NULL_POINTER:
-		//ui_set_null_cursor();
+		ui_set_null_cursor();
 		break;
 
 	default:
@@ -1133,7 +1131,7 @@ static void process_pointer_pdu(STREAM s) {
 		in_uint16_le(s, x);
 		in_uint16_le(s, y);
 		if (s_check(s))
-			//ui_move_pointer(x, y);
+			ui_move_pointer(x, y);
 		break;
 
 	case RDP_POINTER_COLOR:
@@ -1243,8 +1241,8 @@ void process_palette(STREAM s) {
 		in_uint8(s, entry->blue);
 	}
 
-//	hmap = ui_create_colourmap(&map);
-//	ui_set_colourmap(hmap);
+	hmap = ui_create_colourmap(&map);
+	ui_set_colourmap(hmap);
 
 	xfree(map.colours);
 }
@@ -1255,7 +1253,7 @@ static void process_update_pdu(STREAM s) {
 
 	in_uint16_le(s, update_type);
 
-	//ui_begin_update();
+	ui_begin_update();
     __android_log_print(ANDROID_LOG_INFO,"JNIMsg","process_update_pdu STREAM:%p",s);
 	switch (update_type) {
 	case RDP_UPDATE_ORDERS:
@@ -1281,7 +1279,7 @@ static void process_update_pdu(STREAM s) {
 	default:
 		unimpl("update %d\n", update_type);
 	}
-	//ui_end_update();
+	ui_end_update();
 }
 
 /* Process a Save Session Info PDU */
@@ -1396,7 +1394,7 @@ static RD_BOOL process_data_pdu(STREAM s, uint32 * ext_disc_reason) {
 		break;
 
 	case RDP_DATA_PDU_BELL:
-		//ui_bell();
+		ui_bell();
 		break;
 
 	case RDP_DATA_PDU_LOGON:
@@ -1512,7 +1510,6 @@ static RD_BOOL process_redirect_pdu(STREAM s /*, uint32 * ext_disc_reason */) {
 
 	return True;
 }
-//TODO need to be wrapped
 /* Process incoming packets */
 void rdp_main_loop(RD_BOOL * deactivated, uint32 * ext_disc_reason) {
     __android_log_print(ANDROID_LOG_INFO,"JNIMsg","rdp_main_loop");
@@ -1525,16 +1522,16 @@ void rdp_main_loop(RD_BOOL * deactivated, uint32 * ext_disc_reason) {
 
 /* used in uiports and rdp_main_loop, processes the rdp packets waiting */
 RD_BOOL rdp_loop(RD_BOOL * deactivated, uint32 * ext_disc_reason) {
-    __android_log_print(ANDROID_LOG_INFO,"JNIMsg","rdp_loop");
 	uint8 type;
 	RD_BOOL cont = True;
 	STREAM s;
 
 	while (cont) {
 		s = rdp_recv(&type);
-		if (s == NULL
-			)
+		if (s == NULL){
+            __android_log_print(ANDROID_LOG_INFO,"JNIMsg","stream is null");
 			return False;
+        }
 		switch (type) {
 		case RDP_PDU_DEMAND_ACTIVE:
             __android_log_print(ANDROID_LOG_INFO,"JNIMsg","rdp_loop RDP_PDU_DEMAND_ACTIVE");    
@@ -1543,7 +1540,6 @@ RD_BOOL rdp_loop(RD_BOOL * deactivated, uint32 * ext_disc_reason) {
 			break;
 		case RDP_PDU_DEACTIVATE:
             __android_log_print(ANDROID_LOG_INFO,"JNIMsg","rdp_loop RDP_PDU_DEACTIVATE"); 
-			DEBUG(("RDP_PDU_DEACTIVATE\n"));
 			*deactivated = True;
 			break;
 		case RDP_PDU_REDIRECT:
@@ -1560,6 +1556,7 @@ RD_BOOL rdp_loop(RD_BOOL * deactivated, uint32 * ext_disc_reason) {
 			unimpl("PDU %d\n", type);
 		}
 		cont = g_next_packet < s->end;
+        __android_log_print(ANDROID_LOG_INFO,"JNIMsg","rdp_loop cont=%d",cont);
 	}
 	return True;
 }

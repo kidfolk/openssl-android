@@ -25,6 +25,7 @@ LOCAL_SRC_FILES := rdesktop.c \
                    disk.c \
                    serial.c \
                    xwin.c \
+                   bsops.c \
                    jniwrapper.c \
                    
                    

@@ -29,7 +29,6 @@ public class AndroidRDPActivity extends Activity {
 
 					@Override
 					public void run() {
-						imageView.setImageBitmap(bitmap);
 						imageView.invalidate();
 					}
 
@@ -41,18 +40,20 @@ public class AndroidRDPActivity extends Activity {
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		setResolution(metrics.widthPixels, metrics.heightPixels);
-		setResolution(1366, 768);
+		setResolution(1024, 768);
 //		bitmap = Bitmap
 //		.createBitmap(metrics.widthPixels, metrics.heightPixels, Config.RGB_565);
 		bitmap = Bitmap
-		.createBitmap(1366, 768, Config.RGB_565);
+		.createBitmap(1024, 768, Config.RGB_565);
 		canvas = new Canvas(bitmap);
 		imageView = (ImageView) findViewById(R.id.image);
 		imageView.setImageResource(R.drawable.icon);
+		imageView.setImageBitmap(bitmap);
 		setUsername("kidfolk");
 		setPassword("xwjshow");
-//		setUsername("xuwj");
-//		setPassword("1");
+		setUsername("xuwj");
+		setPassword("1");
+		setServerDepth(16);
 		// rdpdr_init();
 		Thread rdesktopMainThread = new Thread(new Runnable() {
 
@@ -60,10 +61,10 @@ public class AndroidRDPActivity extends Activity {
 			public void run() {
 				//while (true) {
 					rdp_reset_state();
-					int result = rdp_connect("192.168.3.115", 51, "", "", "",
-							"", false);
-//					int result = rdp_connect("192.168.3.207", 51, "", "", "",
+//					int result = rdp_connect("192.168.3.115", 59, "", "", "",
 //							"", false);
+					int result = rdp_connect("192.168.3.207", 59, "", "", "",
+							"", false);
 					if (result == 0) {
 						return;
 					}
@@ -83,7 +84,7 @@ public class AndroidRDPActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		rdp_disconnect();
+		//rdp_disconnect();
 	}
 	
 	private native void setResolution(int width,int height);
@@ -93,6 +94,8 @@ public class AndroidRDPActivity extends Activity {
 	private native void setUsername(String username);
 
 	private native void setPassword(String password);
+	
+	private native void setServerDepth(int server_depth);
 
 	private native int rdp_connect(String server, int flags, String domain,
 			String password, String shell, String directory, boolean g_redirect);
@@ -114,9 +117,7 @@ public class AndroidRDPActivity extends Activity {
 
 	private void renderBitmap(int x, int y, int cx, int cy, int width,
 			int height, byte[] data) {
-		//Log.v(TAG, "buffer position:" + buffer.position());
-		// count++;
-		// buffer.position(y*2);
+	
 		ByteBuffer tmpBuffer = ByteBuffer.wrap(data);
 		Bitmap tmpBitmap = Bitmap.createBitmap(width, height, Config.RGB_565);
 		tmpBitmap.copyPixelsFromBuffer(tmpBuffer);
@@ -154,12 +155,18 @@ public class AndroidRDPActivity extends Activity {
 		Message msg = new Message();
 		this.handler.sendMessage(msg);
 	}
+	
+	private void setPixel(int x, int y, int color)
+    {
+    	bitmap.setPixel(x, y, color);
+    	
+    	Message message = new Message();    
+        this.handler.sendMessage(message);
+    }
 
 	private int count = 0;
 
 	private ImageView imageView;
-
-	private static ByteBuffer buffer = ByteBuffer.allocateDirect(800 * 600 * 4);
 
 	private static Bitmap bitmap ;
 

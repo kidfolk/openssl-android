@@ -377,7 +377,7 @@ void cache_put_cursor(uint16 cache_idx, RD_HCURSOR cursor) {
 		old = g_cursorcache[cache_idx];
 		if (old != NULL
 			)
-			// TODO ui_destroy_cursor(old);
+			ui_destroy_cursor(old);
 
 		g_cursorcache[cache_idx] = cursor;
 	} else {
