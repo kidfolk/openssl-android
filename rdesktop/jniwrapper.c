@@ -1,4 +1,5 @@
 #include "org_kidfolk_androidRDP_AndroidRDPActivity.h"
+#include "org_kidfolk_androidRDP_RemoteView.h"
 #include "rdesktop.h"
 
 extern int g_width;
@@ -9,6 +10,8 @@ extern char *password;
 
 extern RD_BOOL deactivated;
 extern uint32 ext_disc_reason;
+
+uint32 g_last_gesturetime;
 
 JavaVM *cached_jvm;
 JNIEnv *cached_env;
@@ -187,6 +190,18 @@ void android_draw_rect(int x,int y,int cx,int cy,uint32 color)
     (*cached_env)->CallVoidMethod(cached_env, cached_obj, mid,x,y,cx,cy,color);
     (*cached_env)->DeleteLocalRef(cached_env,cls);
 }
+
+/*
+ * Class:     org_kidfolk_androidRDP_RemoteView
+ * Method:    native_handle_mouse_button
+ * Signature: (JIIII)V
+ */
+JNIEXPORT void JNICALL Java_org_kidfolk_androidRDP_RemoteView_native_1handle_1mouse_1button
+(JNIEnv *env, jobject obj, jlong time, jint button, jint x, jint y, jint isdown)
+{
+    handle_button_event((uint32)time,button,x,y,isdown);
+}
+
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved)
 {

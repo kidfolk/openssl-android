@@ -41,12 +41,17 @@ public class AndroidRDPActivity extends Activity {
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		setResolution(metrics.widthPixels, metrics.heightPixels);
-		setResolution(800, 600);
+		setResolution(1366, 768);
+//		bitmap = Bitmap
+//		.createBitmap(metrics.widthPixels, metrics.heightPixels, Config.RGB_565);
+		bitmap = Bitmap
+		.createBitmap(1366, 768, Config.RGB_565);
+		canvas = new Canvas(bitmap);
 		imageView = (ImageView) findViewById(R.id.image);
 		imageView.setImageResource(R.drawable.icon);
 		setUsername("kidfolk");
 		setPassword("xwjshow");
-//		setUsername("unn");
+//		setUsername("xuwj");
 //		setPassword("1");
 		// rdpdr_init();
 		Thread rdesktopMainThread = new Thread(new Runnable() {
@@ -156,10 +161,9 @@ public class AndroidRDPActivity extends Activity {
 
 	private static ByteBuffer buffer = ByteBuffer.allocateDirect(800 * 600 * 4);
 
-	private static Bitmap bitmap = Bitmap
-			.createBitmap(800, 600, Config.RGB_565);
+	private static Bitmap bitmap ;
 
-	private static Canvas canvas = new Canvas(bitmap);
+	private static Canvas canvas ;
 	
 	private Handler handler;
 

@@ -9,6 +9,8 @@ extern int g_server_depth;
 static int g_red_shift_r, g_blue_shift_r, g_green_shift_r;
 static int g_red_shift_l, g_blue_shift_l, g_green_shift_l;
 
+uint32 g_last_gesturetime;
+
 struct bitmap
 {
     uint8 *data;
@@ -166,6 +168,53 @@ void ui_rect(
     
     android_draw_rect(x,y,cx,cy,color);
 }
+
+void handle_button_event(uint32 time,int button,int x,int y,int isdown) {
+	
+	uint16 mbutton, flags = 0;
+	g_last_gesturetime = time;
+	/* Reverse the pointer button mapping, e.g. in the case of
+	 "left-handed mouse mode"; the RDP session expects to
+	 receive physical buttons (true in mstsc as well) and
+	 logical button behavior depends on the remote desktop's own
+	 mouse settings */
+	mbutton = xkeymap_translate_button(button);
+	if (mbutton == 0)
+		return;
+    
+	if (isdown)
+		flags |= MOUSE_FLAG_DOWN;
+    
+	
+    rdp_send_input(0, RDP_INPUT_MOUSE, flags | mbutton,
+                   x, y);
+	
+}
+
+uint16
+xkeymap_translate_button(unsigned int button)
+{
+	switch (button)
+	{
+		case 1:	/* left */
+			return MOUSE_FLAG_BUTTON1;
+		case 2:	/* middle */
+			return MOUSE_FLAG_BUTTON3;
+		case 3:	/* right */
+			return MOUSE_FLAG_BUTTON2;
+		case 4:	/* wheel up */
+			return MOUSE_FLAG_BUTTON4;
+		case 5:	/* wheel down */
+			return MOUSE_FLAG_BUTTON5;
+	}
+    
+	return 0;
+}
+
+
+
+
+
 
 
 
